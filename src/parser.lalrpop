@@ -1,0 +1,32 @@
+use crate::types;
+use std::rc::Rc;
+
+grammar;
+
+pub Objects = <Object*>;
+
+Object: types::Object = {
+    Symbol => types::Object::Symbol(<>),
+    Application => types::Object::Application(<>),
+    Lambda => types::Object::Lambda(<>),
+};
+
+Symbol: types::Symbol = r"[a-zA-Z_][a-zA-Z0-9_]*" => types::Symbol::new(
+    String::from(<>));
+
+Application = "(" <IApplication> ")";
+
+IApplication: types::Application = {
+    <func:Object> <arg:Object> => types::Application::new(
+        Rc::new(func), Rc::new(arg)),
+    <func:IApplication> <arg:Object> => types::Application::new(
+        Rc::new(types::Object::Application(func)), Rc::new(arg)),
+};
+
+Lambda = "(" "\\" <ILambda> ")";
+
+ILambda: types::Lambda = {
+    <var:Symbol> "." <body:Object> => types::Lambda::new(var, Rc::new(body)),
+    <var:Symbol> <body:ILambda> => types::Lambda::new(var, Rc::new(
+            types::Object::Lambda(body))),
+}

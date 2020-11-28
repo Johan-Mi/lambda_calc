@@ -3,38 +3,38 @@ use super::types::*;
 use std::rc::Rc;
 
 fn parse_symbol(tokens: &[Token]) -> Option<(Symbol, &[Token])> {
-    match tokens.first() {
-        Some(Token::Ident(symbol)) => {
-            Some((Symbol::new(symbol.to_string()), tokens.get(1..)?))
+    match tokens.split_first() {
+        Some((Token::Ident(symbol), tokens)) => {
+            Some((Symbol::new(symbol.to_string()), tokens))
         }
         _ => None,
     }
 }
 
 fn parse_lparen(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.first() {
-        Some(Token::LParen) => tokens.get(1..),
+    match tokens.split_first() {
+        Some((Token::LParen, tokens)) => Some(tokens),
         _ => None,
     }
 }
 
 fn parse_rparen(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.first() {
-        Some(Token::RParen) => tokens.get(1..),
+    match tokens.split_first() {
+        Some((Token::RParen, tokens)) => Some(tokens),
         _ => None,
     }
 }
 
 fn parse_dot(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.first() {
-        Some(Token::Dot) => tokens.get(1..),
+    match tokens.split_first() {
+        Some((Token::Dot, tokens)) => Some(tokens),
         _ => None,
     }
 }
 
 fn parse_backslash(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.first() {
-        Some(Token::Backslash) => tokens.get(1..),
+    match tokens.split_first() {
+        Some((Token::Backslash, tokens)) => Some(tokens),
         _ => None,
     }
 }

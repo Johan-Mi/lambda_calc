@@ -1,20 +1,22 @@
+mod lexer;
+mod parser;
 mod types;
 
+use lexer::*;
+use logos::Logos;
+use parser::*;
 use std::collections::HashMap;
-
-#[macro_use]
-extern crate lalrpop_util;
-
-lalrpop_mod!(pub parser);
 
 fn main() {
     let mut env = HashMap::new();
 
     let src = r"((\x f . (f x)) b (\n . n))";
-    let parsed = match parser::ObjectsParser::new().parse(src) {
-        Ok(ok) => ok,
-        Err(err) => {
-            eprintln!("{}", err);
+    let lex = Token::lexer(src);
+    let lexed = lex.collect::<Vec<_>>();
+    let parsed = match parse_expressions(&lexed) {
+        Some((ok, _)) => ok,
+        None => {
+            eprintln!("Parser failed");
             return;
         }
     };

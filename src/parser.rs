@@ -75,17 +75,15 @@ fn parse_application(tokens: &[Token]) -> Option<(Application, &[Token])> {
 }
 
 fn parse_expression(tokens: &[Token]) -> Option<(Object, &[Token])> {
-    if let Some((expr, unconsumed_tokens)) = parse_lambda(tokens) {
-        return Some((Object::Lambda(expr), unconsumed_tokens));
+    if let Some((expr, tokens)) = parse_lambda(tokens) {
+        Some((Object::Lambda(expr), tokens))
+    } else if let Some((expr, tokens)) = parse_application(tokens) {
+        Some((Object::Application(expr), tokens))
+    } else if let Some((expr, tokens)) = parse_symbol(tokens) {
+        Some((Object::Symbol(expr), tokens))
+    } else {
+        None
     }
-    if let Some((expr, unconsumed_tokens)) = parse_application(tokens) {
-        return Some((Object::Application(expr), unconsumed_tokens));
-    }
-    if let Some((expr, unconsumed_tokens)) = parse_symbol(tokens) {
-        return Some((Object::Symbol(expr), unconsumed_tokens));
-    }
-
-    None
 }
 
 pub fn parse_expressions(

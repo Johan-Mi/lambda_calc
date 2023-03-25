@@ -1,7 +1,7 @@
-use super::application::*;
-use super::env::*;
-use super::lambda::*;
-use super::symbol::*;
+use super::application::Application;
+use super::env::Env;
+use super::lambda::Lambda;
+use super::symbol::Symbol;
 use derive_more::Display;
 use std::rc::Rc;
 
@@ -13,11 +13,11 @@ pub enum Object {
 }
 
 impl Object {
-    pub fn eval(&self, env: &mut Env) -> Rc<Object> {
+    pub fn eval(&self, env: &mut Env) -> Rc<Self> {
         match self {
-            Object::Symbol(contained) => contained.eval(env),
-            Object::Application(contained) => contained.eval(env),
-            Object::Lambda(contained) => contained.eval(env),
+            Self::Symbol(contained) => contained.eval(env),
+            Self::Application(contained) => contained.eval(env),
+            Self::Lambda(contained) => contained.eval(env),
         }
     }
 }

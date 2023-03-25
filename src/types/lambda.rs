@@ -1,11 +1,11 @@
-use super::env::*;
-use super::object::*;
-use super::symbol::*;
+use super::env::Env;
+use super::object::Object;
+use super::symbol::Symbol;
 use derive_more::{Constructor, Display};
 use std::rc::Rc;
 
 #[derive(Constructor, Display, Debug, Clone)]
-#[display(fmt = "(\\{} . {})", var, body)]
+#[display(fmt = "(\\{var} . {body})")]
 pub struct Lambda {
     var: Symbol,
     body: Rc<Object>,
@@ -13,7 +13,7 @@ pub struct Lambda {
 
 impl Lambda {
     pub fn eval(&self, env: &mut Env) -> Rc<Object> {
-        Rc::new(Object::Lambda(Lambda::new(
+        Rc::new(Object::Lambda(Self::new(
             self.var.clone(),
             self.body.eval(env),
         )))

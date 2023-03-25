@@ -1,5 +1,5 @@
-use super::lexer::*;
-use super::types::*;
+use super::lexer::Token;
+use super::types::{Application, Lambda, Object, Symbol};
 use std::rc::Rc;
 
 fn parse_symbol(tokens: &[Token]) -> Option<(Symbol, &[Token])> {
@@ -11,28 +11,28 @@ fn parse_symbol(tokens: &[Token]) -> Option<(Symbol, &[Token])> {
     }
 }
 
-fn parse_lparen(tokens: &[Token]) -> Option<&[Token]> {
+const fn parse_lparen(tokens: &[Token]) -> Option<&[Token]> {
     match tokens.split_first() {
         Some((Token::LParen, tokens)) => Some(tokens),
         _ => None,
     }
 }
 
-fn parse_rparen(tokens: &[Token]) -> Option<&[Token]> {
+const fn parse_rparen(tokens: &[Token]) -> Option<&[Token]> {
     match tokens.split_first() {
         Some((Token::RParen, tokens)) => Some(tokens),
         _ => None,
     }
 }
 
-fn parse_dot(tokens: &[Token]) -> Option<&[Token]> {
+const fn parse_dot(tokens: &[Token]) -> Option<&[Token]> {
     match tokens.split_first() {
         Some((Token::Dot, tokens)) => Some(tokens),
         _ => None,
     }
 }
 
-fn parse_backslash(tokens: &[Token]) -> Option<&[Token]> {
+const fn parse_backslash(tokens: &[Token]) -> Option<&[Token]> {
     match tokens.split_first() {
         Some((Token::Backslash, tokens)) => Some(tokens),
         _ => None,

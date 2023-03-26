@@ -1,6 +1,7 @@
+mod env;
 mod lexer;
 mod parser;
-mod types;
+mod term;
 
 use lexer::Token;
 use logos::Logos;

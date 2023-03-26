@@ -1,5 +1,5 @@
 use super::env::Env;
-use super::object::Object;
+use super::term::Term;
 use derive_more::{Constructor, Display};
 use std::rc::Rc;
 
@@ -9,9 +9,9 @@ pub struct Symbol {
 }
 
 impl Symbol {
-    pub fn eval(&self, env: &Env) -> Rc<Object> {
+    pub fn eval(&self, env: &Env) -> Rc<Term> {
         env.get(self)
             .and_then(|stack| stack.last().cloned())
-            .unwrap_or_else(|| Rc::new(Object::Symbol(self.clone())))
+            .unwrap_or_else(|| Rc::new(Term::Symbol(self.clone())))
     }
 }

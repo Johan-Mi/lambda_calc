@@ -1,5 +1,5 @@
-mod object;
-pub use object::*;
+mod term;
+pub use term::*;
 mod symbol;
 pub use symbol::*;
 mod application;

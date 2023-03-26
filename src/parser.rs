@@ -1,5 +1,5 @@
 use super::lexer::Token;
-use super::types::{Application, Lambda, Object, Symbol};
+use super::types::{Application, Lambda, Symbol, Term};
 use std::rc::Rc;
 
 fn parse_symbol(tokens: &[Token]) -> Option<(Symbol, &[Token])> {
@@ -47,7 +47,7 @@ fn parse_lambda(tokens: &[Token]) -> Option<(Lambda, &[Token])> {
             Some((Lambda::new(var, Rc::new(body)), tokens))
         } else {
             let (body, tokens) = parse_lambda_internal(tokens)?;
-            Some((Lambda::new(var, Rc::new(Object::Lambda(body))), tokens))
+            Some((Lambda::new(var, Rc::new(Term::Lambda(body))), tokens))
         }
     }
 
@@ -66,7 +66,7 @@ fn parse_application(tokens: &[Token]) -> Option<(Application, &[Token])> {
     while let Some((arg, remaining_tokens)) = parse_expression(tokens) {
         tokens = remaining_tokens;
         application = Application::new(
-            Rc::new(Object::Application(application)),
+            Rc::new(Term::Application(application)),
             Rc::new(arg),
         );
     }
@@ -74,13 +74,13 @@ fn parse_application(tokens: &[Token]) -> Option<(Application, &[Token])> {
     Some((application, tokens))
 }
 
-fn parse_expression(tokens: &[Token]) -> Option<(Object, &[Token])> {
+fn parse_expression(tokens: &[Token]) -> Option<(Term, &[Token])> {
     if let Some((expr, tokens)) = parse_lambda(tokens) {
-        Some((Object::Lambda(expr), tokens))
+        Some((Term::Lambda(expr), tokens))
     } else if let Some((expr, tokens)) = parse_application(tokens) {
-        Some((Object::Application(expr), tokens))
+        Some((Term::Application(expr), tokens))
     } else if let Some((expr, tokens)) = parse_symbol(tokens) {
-        Some((Object::Symbol(expr), tokens))
+        Some((Term::Symbol(expr), tokens))
     } else {
         None
     }
@@ -88,7 +88,7 @@ fn parse_expression(tokens: &[Token]) -> Option<(Object, &[Token])> {
 
 pub fn parse_expressions(
     mut tokens: &[Token],
-) -> Option<(Vec<Object>, &[Token])> {
+) -> Option<(Vec<Term>, &[Token])> {
     let mut ret = Vec::new();
 
     while let Some((expr, remaining_tokens)) = parse_expression(tokens) {

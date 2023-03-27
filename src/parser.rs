@@ -11,32 +11,20 @@ fn parse_symbol(tokens: &[Token]) -> Option<(String, &[Token])> {
     }
 }
 
-const fn parse_lparen(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.split_first() {
-        Some((Token::LParen, tokens)) => Some(tokens),
-        _ => None,
-    }
+fn parse_lparen(tokens: &[Token]) -> Option<&[Token]> {
+    tokens.strip_prefix(&[Token::LParen])
 }
 
-const fn parse_rparen(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.split_first() {
-        Some((Token::RParen, tokens)) => Some(tokens),
-        _ => None,
-    }
+fn parse_rparen(tokens: &[Token]) -> Option<&[Token]> {
+    tokens.strip_prefix(&[Token::RParen])
 }
 
-const fn parse_dot(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.split_first() {
-        Some((Token::Dot, tokens)) => Some(tokens),
-        _ => None,
-    }
+fn parse_dot(tokens: &[Token]) -> Option<&[Token]> {
+    tokens.strip_prefix(&[Token::Dot])
 }
 
-const fn parse_backslash(tokens: &[Token]) -> Option<&[Token]> {
-    match tokens.split_first() {
-        Some((Token::Backslash, tokens)) => Some(tokens),
-        _ => None,
-    }
+fn parse_backslash(tokens: &[Token]) -> Option<&[Token]> {
+    tokens.strip_prefix(&[Token::Backslash])
 }
 
 fn parse_lambda(tokens: &[Token]) -> Option<(Term, &[Token])> {

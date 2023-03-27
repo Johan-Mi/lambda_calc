@@ -1,6 +1,6 @@
 use logos::Logos;
 
-#[derive(Logos)]
+#[derive(Logos, PartialEq, Eq)]
 pub enum Token {
     #[token("(")]
     LParen,

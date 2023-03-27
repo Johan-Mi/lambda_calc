@@ -1,5 +1,4 @@
-use super::lexer::Token;
-use super::term::Term;
+use super::{lexer::Token, term::Term};
 use std::rc::Rc;
 
 fn parse_symbol(tokens: &[Token]) -> Option<(String, &[Token])> {

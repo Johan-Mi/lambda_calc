@@ -22,16 +22,18 @@ impl Term {
         match self {
             Self::Symbol(sym) => env
                 .get(sym)
-                .and_then(|stack| stack.last().cloned())
+                .cloned()
                 .unwrap_or_else(|| Rc::new(Self::Symbol(sym.clone()))),
             Self::Application { func, arg } => {
                 let func = func.eval(env);
                 let arg = arg.eval(env);
                 match &*func {
                     Self::Lambda { var, body } => {
-                        env.entry(var.clone()).or_default().push(arg);
+                        let old = env.insert(var.clone(), arg);
                         let ret = body.eval(env);
-                        env.entry(var.clone()).or_default().pop();
+                        if let Some(old) = old {
+                            env.insert(var.clone(), old);
+                        }
                         ret
                     }
                     _ => Rc::new(Self::Application { func, arg }),

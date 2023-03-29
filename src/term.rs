@@ -1,5 +1,8 @@
 use crate::env::Env;
-use std::{fmt, rc::Rc};
+use std::{
+    fmt::{self, Write},
+    rc::Rc,
+};
 
 pub enum Term {
     Symbol(String),
@@ -9,11 +12,35 @@ pub enum Term {
 
 impl fmt::Display for Term {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Term::Symbol(sym) => f.write_str(sym),
-            Term::Application { func, arg } => write!(f, "({func} {arg})"),
-            Term::Lambda { var, body } => write!(f, "(\\{var}. {body})"),
+        fn display(
+            term: &Term,
+            is_application_head: bool,
+            f: &mut fmt::Formatter,
+        ) -> fmt::Result {
+            match term {
+                Term::Symbol(sym) => f.write_str(sym),
+                Term::Application { func, arg } => {
+                    if !is_application_head {
+                        f.write_char('(')?;
+                    }
+                    display(func, true, f)?;
+                    f.write_char(' ')?;
+                    display(arg, false, f)?;
+                    if !is_application_head {
+                        f.write_char(')')?;
+                    }
+                    Ok(())
+                }
+                Term::Lambda { var, body } => {
+                    write!(f, "(\\{var}. ")?;
+                    display(body, false, f)?;
+                    f.write_char(')')?;
+                    Ok(())
+                }
+            }
         }
+
+        display(self, false, f)
     }
 }
 

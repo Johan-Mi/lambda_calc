@@ -10,7 +10,7 @@ pub enum Token {
     Backslash,
     #[token(".")]
     Dot,
-    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_string())]
+    #[regex(r"[a-zA-Z_-][a-zA-Z0-9_-]*", |lex| lex.slice().to_string())]
     Ident(String),
 
     #[error]

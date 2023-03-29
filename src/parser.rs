@@ -76,7 +76,7 @@ fn parse_application(tokens: &[Token]) -> Option<(Term, &[Token])> {
     Some((application, tokens))
 }
 
-fn parse_expression(tokens: &[Token]) -> Option<(Term, &[Token])> {
+pub fn parse_expression(tokens: &[Token]) -> Option<(Term, &[Token])> {
     if let Some((expr, tokens)) = parse_lambda(tokens) {
         Some((expr, tokens))
     } else if let Some((expr, tokens)) = parse_application(tokens) {

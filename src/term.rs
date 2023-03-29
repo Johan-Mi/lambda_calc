@@ -1,20 +1,21 @@
 use crate::env::Env;
-use derive_more::Display;
-use std::rc::Rc;
+use std::{fmt, rc::Rc};
 
-#[derive(Display, Debug)]
+#[derive(Debug)]
 pub enum Term {
     Symbol(String),
-    #[display(fmt = "({func} {arg})")]
-    Application {
-        func: Rc<Self>,
-        arg: Rc<Self>,
-    },
-    #[display(fmt = "(\\{var} . {body})")]
-    Lambda {
-        var: String,
-        body: Rc<Self>,
-    },
+    Application { func: Rc<Self>, arg: Rc<Self> },
+    Lambda { var: String, body: Rc<Self> },
+}
+
+impl fmt::Display for Term {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Term::Symbol(sym) => f.write_str(sym),
+            Term::Application { func, arg } => write!(f, "({func} {arg})"),
+            Term::Lambda { var, body } => write!(f, "(\\{var}. {body})"),
+        }
+    }
 }
 
 impl Term {

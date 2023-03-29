@@ -5,22 +5,22 @@ mod term;
 
 use lexer::Token;
 use logos::Logos;
-use parser::parse_expressions;
-use std::collections::HashMap;
+use std::{collections::HashMap, io::Write};
 
 fn main() {
     let mut env = HashMap::new();
 
-    let src = r"((\x f . (f x)) b (\n . n))";
-    let lex = Token::lexer(src);
-    let lexed = lex.collect::<Vec<_>>();
-    let Some((parsed, _)) = parse_expressions(&lexed) else {
-        eprintln!("Parser failed");
-        return;
-    };
-    for i in parsed {
-        println!("{i}");
-        println!("=> {}", i.eval(&mut env));
+    loop {
+        print!("> ");
+        std::io::stdout().flush().unwrap();
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input).unwrap();
+        let lexer = Token::lexer(&input);
+        let tokens = lexer.collect::<Vec<_>>();
+        match parser::parse_expression(&tokens) {
+            Some((parsed, &[])) => println!("{}", parsed.eval(&mut env)),
+            _ => println!("Syntax error!"),
+        }
     }
 }
 

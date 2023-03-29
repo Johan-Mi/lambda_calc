@@ -87,20 +87,3 @@ pub fn parse_expression(tokens: &[Token]) -> Option<(Term, &[Token])> {
         None
     }
 }
-
-pub fn parse_expressions(
-    mut tokens: &[Token],
-) -> Option<(Vec<Term>, &[Token])> {
-    let mut ret = Vec::new();
-
-    while let Some((expr, remaining_tokens)) = parse_expression(tokens) {
-        ret.push(expr);
-        tokens = remaining_tokens;
-    }
-
-    if ret.is_empty() {
-        None
-    } else {
-        Some((ret, tokens))
-    }
-}

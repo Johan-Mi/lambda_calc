@@ -1,7 +1,6 @@
 use crate::env::Env;
 use std::{fmt, rc::Rc};
 
-#[derive(Debug)]
 pub enum Term {
     Symbol(String),
     Application { func: Rc<Self>, arg: Rc<Self> },

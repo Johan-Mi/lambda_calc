@@ -40,7 +40,9 @@ impl fmt::Display for Term {
                     f.write_str(if is_lambda_body { " " } else { "(\\" })?;
                     f.write_str(var)?;
                     display(body, false, true, f)?;
-                    f.write_char(')')?;
+                    if !is_lambda_body {
+                        f.write_char(')')?;
+                    }
                     Ok(())
                 }
             }

@@ -5,17 +5,13 @@ mod term;
 
 use lexer::Token;
 use logos::Logos;
-use std::{collections::HashMap, io::Write};
+use std::collections::HashMap;
 
 fn main() {
     let mut env = HashMap::new();
-
-    loop {
-        print!("> ");
-        std::io::stdout().flush().unwrap();
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).unwrap();
-        let lexer = Token::lexer(&input);
+    let mut editor = rustyline::DefaultEditor::new().unwrap();
+    for line in editor.iter("> ").filter_map(Result::ok) {
+        let lexer = Token::lexer(&line);
         let tokens = lexer.collect::<Vec<_>>();
         match parser::parse_expression(&tokens) {
             Some((parsed, &[])) => println!("{}", parsed.eval(&mut env)),

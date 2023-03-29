@@ -15,32 +15,38 @@ impl fmt::Display for Term {
         fn display(
             term: &Term,
             is_application_head: bool,
+            is_lambda_body: bool,
             f: &mut fmt::Formatter,
         ) -> fmt::Result {
+            if is_lambda_body && !matches!(term, Term::Lambda { .. }) {
+                f.write_str(". ")?;
+            }
+
             match term {
                 Term::Symbol(sym) => f.write_str(sym),
                 Term::Application { func, arg } => {
                     if !is_application_head {
                         f.write_char('(')?;
                     }
-                    display(func, true, f)?;
+                    display(func, true, false, f)?;
                     f.write_char(' ')?;
-                    display(arg, false, f)?;
+                    display(arg, false, false, f)?;
                     if !is_application_head {
                         f.write_char(')')?;
                     }
                     Ok(())
                 }
                 Term::Lambda { var, body } => {
-                    write!(f, "(\\{var}. ")?;
-                    display(body, false, f)?;
+                    f.write_str(if is_lambda_body { " " } else { "(\\" })?;
+                    f.write_str(var)?;
+                    display(body, false, true, f)?;
                     f.write_char(')')?;
                     Ok(())
                 }
             }
         }
 
-        display(self, false, f)
+        display(self, false, false, f)
     }
 }
 

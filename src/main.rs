@@ -9,7 +9,11 @@ use std::collections::HashMap;
 
 fn main() {
     let mut env = HashMap::new();
-    let mut editor = rustyline::DefaultEditor::new().unwrap();
+    let mut editor = rustyline::Editor::<(), _>::with_history(
+        rustyline::Config::builder().auto_add_history(true).build(),
+        rustyline::history::MemHistory::new(),
+    )
+    .unwrap();
     for line in editor.iter("> ").filter_map(Result::ok) {
         let lexer = Token::lexer(&line);
         let tokens = lexer.collect::<Vec<_>>();

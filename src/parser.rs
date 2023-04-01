@@ -56,33 +56,33 @@ fn lambda(tokens: &[Token]) -> Option<(Term, &[Token])> {
     Some((lambda, tokens))
 }
 
-fn application(tokens: &[Token]) -> Option<(Term, &[Token])> {
+pub fn parenthesized(tokens: &[Token]) -> Option<(Term, &[Token])> {
     let tokens = lparen(tokens)?;
-    let (func, tokens) = term(tokens)?;
-    let (first_arg, mut tokens) = term(tokens)?;
-    let mut application = Term::Application {
-        func: Rc::new(func),
-        arg: Rc::new(first_arg),
-    };
-    while let Some((arg, remaining_tokens)) = term(tokens) {
-        tokens = remaining_tokens;
-        application = Term::Application {
-            func: Rc::new(application),
-            arg: Rc::new(arg),
-        };
-    }
+    let (inner, tokens) = term(tokens)?;
     let tokens = rparen(tokens)?;
-    Some((application, tokens))
+    Some((inner, tokens))
 }
 
-pub fn term(tokens: &[Token]) -> Option<(Term, &[Token])> {
+pub fn atom(tokens: &[Token]) -> Option<(Term, &[Token])> {
     if let Some((expr, tokens)) = lambda(tokens) {
         Some((expr, tokens))
-    } else if let Some((expr, tokens)) = application(tokens) {
+    } else if let Some((expr, tokens)) = parenthesized(tokens) {
         Some((expr, tokens))
     } else if let Some((sym, tokens)) = symbol(tokens) {
         Some((Term::Symbol(sym), tokens))
     } else {
         None
     }
+}
+
+pub fn term(tokens: &[Token]) -> Option<(Term, &[Token])> {
+    let (mut term, mut tokens) = atom(tokens)?;
+    while let Some((arg, remaining_tokens)) = atom(tokens) {
+        tokens = remaining_tokens;
+        term = Term::Application {
+            func: Rc::new(term),
+            arg: Rc::new(arg),
+        };
+    }
+    Some((term, tokens))
 }

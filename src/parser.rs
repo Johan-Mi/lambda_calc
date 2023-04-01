@@ -2,11 +2,10 @@ use super::{lexer::Token, term::Term};
 use std::rc::Rc;
 
 fn symbol(tokens: &[Token]) -> Option<(String, &[Token])> {
-    match tokens.split_first() {
-        Some((Token::Ident(symbol), tokens)) => {
-            Some((symbol.to_string(), tokens))
-        }
-        _ => None,
+    if let [Token::Ident(symbol), tokens @ ..] = tokens {
+        Some((symbol.to_string(), tokens))
+    } else {
+        None
     }
 }
 

@@ -10,6 +10,8 @@ pub enum Token {
     Backslash,
     #[token(".")]
     Dot,
+    #[token("=")]
+    EqualsSign,
     #[regex(r"[a-zA-Z_-][a-zA-Z0-9_-]*", |lex| lex.slice().to_string())]
     Ident(String),
 

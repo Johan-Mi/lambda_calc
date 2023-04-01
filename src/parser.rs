@@ -1,4 +1,4 @@
-use super::{lexer::Token, term::Term};
+use super::{lexer::Token, statement::Statement, term::Term};
 use std::rc::Rc;
 
 fn symbol(tokens: &[Token]) -> Option<(String, &[Token])> {
@@ -85,4 +85,24 @@ pub fn term(tokens: &[Token]) -> Option<(Term, &[Token])> {
         };
     }
     Some((term, tokens))
+}
+
+pub fn statement(tokens: &[Token]) -> Option<Statement> {
+    match tokens {
+        [Token::Ident(var), Token::EqualsSign, tokens @ ..] => {
+            let (value, []) = term(tokens)? else { return None; };
+            Some(Statement::Assign {
+                var: var.to_owned(),
+                value,
+            })
+        }
+        _ => {
+            let (term, tokens) = term(tokens)?;
+            if tokens.is_empty() {
+                Some(Statement::Evaluate(term))
+            } else {
+                None
+            }
+        }
+    }
 }

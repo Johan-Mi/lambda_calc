@@ -1,6 +1,7 @@
 mod env;
 mod lexer;
 mod parser;
+mod statement;
 mod term;
 
 use lexer::Token;
@@ -17,9 +18,15 @@ fn main() {
     for line in editor.iter("> ").filter_map(Result::ok) {
         let lexer = Token::lexer(&line);
         let tokens = lexer.collect::<Vec<_>>();
-        match parser::term(&tokens) {
-            Some((parsed, &[])) => println!("{}", parsed.eval(&mut env)),
-            _ => println!("Syntax error!"),
+        match parser::statement(&tokens) {
+            Some(statement::Statement::Evaluate(term)) => {
+                println!("{}", term.eval(&mut env));
+            }
+            Some(statement::Statement::Assign { var, value }) => {
+                let value = value.eval(&mut env);
+                env.insert(var, value);
+            }
+            None => println!("Syntax error!"),
         }
     }
 }

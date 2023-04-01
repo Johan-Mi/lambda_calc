@@ -74,10 +74,17 @@ impl Term {
                     _ => Rc::new(Self::Application { func, arg }),
                 }
             }
-            Self::Lambda { var, body } => Rc::new(Self::Lambda {
-                var: var.clone(),
-                body: body.eval(env),
-            }),
+            Self::Lambda { var, body } => {
+                let old = env.remove(var);
+                let ret = Rc::new(Self::Lambda {
+                    var: var.clone(),
+                    body: body.eval(env),
+                });
+                if let Some(old) = old {
+                    env.insert(var.clone(), old);
+                }
+                ret
+            }
         }
     }
 }

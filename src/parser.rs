@@ -1,9 +1,10 @@
 use super::{lexer::Token, statement::Statement, term::Term};
+use internment::Intern;
 use std::rc::Rc;
 
-fn symbol(tokens: &[Token]) -> Option<(String, &[Token])> {
+fn symbol(tokens: &[Token]) -> Option<(Intern<str>, &[Token])> {
     if let [Token::Ident(symbol), tokens @ ..] = tokens {
-        Some((symbol.to_string(), tokens))
+        Some((*symbol, tokens))
     } else {
         None
     }
@@ -91,10 +92,7 @@ pub fn statement(tokens: &[Token]) -> Option<Statement> {
     match tokens {
         [Token::Ident(var), Token::EqualsSign, tokens @ ..] => {
             let (value, []) = term(tokens)? else { return None; };
-            Some(Statement::Assign {
-                var: var.to_owned(),
-                value,
-            })
+            Some(Statement::Assign { var: *var, value })
         }
         _ => {
             let (term, tokens) = term(tokens)?;

@@ -1,14 +1,15 @@
 use crate::env::Env;
+use internment::Intern;
 use std::{
     fmt::{self, Write},
     rc::Rc,
 };
 
 pub enum Term {
-    Var(String),
-    Free(String),
+    Var(Intern<str>),
+    Free(Intern<str>),
     Application { func: Rc<Self>, arg: Rc<Self> },
-    Lambda { var: String, body: Rc<Self> },
+    Lambda { var: Intern<str>, body: Rc<Self> },
 }
 
 impl fmt::Display for Term {
@@ -60,17 +61,17 @@ impl Term {
             Self::Var(sym) => env
                 .get(sym)
                 .cloned()
-                .unwrap_or_else(|| Rc::new(Self::Free(sym.clone()))),
-            Self::Free(sym) => Rc::new(Self::Free(sym.clone())),
+                .unwrap_or_else(|| Rc::new(Self::Free(*sym))),
+            Self::Free(sym) => Rc::new(Self::Free(*sym)),
             Self::Application { func, arg } => {
                 let func = func.eval(env);
                 let arg = arg.eval(env);
                 match &*func {
                     Self::Lambda { var, body } => {
-                        let old = env.insert(var.clone(), arg);
+                        let old = env.insert(*var, arg);
                         let ret = body.eval(env);
                         if let Some(old) = old {
-                            env.insert(var.clone(), old);
+                            env.insert(*var, old);
                         } else {
                             env.remove(var);
                         }
@@ -80,14 +81,13 @@ impl Term {
                 }
             }
             Self::Lambda { var, body } => {
-                let old =
-                    env.insert(var.clone(), Rc::new(Self::Var(var.clone())));
+                let old = env.insert(*var, Rc::new(Self::Var(*var)));
                 let ret = Rc::new(Self::Lambda {
-                    var: var.clone(),
+                    var: *var,
                     body: body.eval(env),
                 });
                 if let Some(old) = old {
-                    env.insert(var.clone(), old);
+                    env.insert(*var, old);
                 } else {
                     env.remove(var);
                 }

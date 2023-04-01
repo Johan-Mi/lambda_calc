@@ -1,0 +1,9 @@
+Z = (\s z. z)
+S = (\n s z. n s (s z))
+One = S Z
+Two = S One
+Three = S Two
+Four = S Three
+Five = S Four
+add = (\a b s z. a s (b s z))
+mul = (\a b s. a (b s))

@@ -69,7 +69,7 @@ pub fn atom(tokens: &[Token]) -> Option<(Term, &[Token])> {
     } else if let Some((expr, tokens)) = parenthesized(tokens) {
         Some((expr, tokens))
     } else if let Some((sym, tokens)) = symbol(tokens) {
-        Some((Term::Symbol(sym), tokens))
+        Some((Term::Var(sym), tokens))
     } else {
         None
     }

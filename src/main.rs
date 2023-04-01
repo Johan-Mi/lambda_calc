@@ -53,10 +53,10 @@ mod tests {
             );
         }
 
-        case("a", "a");
-        case("long_name", "long_name");
-        case("x y z", "(x y z)");
+        case("a", "'a");
+        case("long_name", "'long_name");
+        case("x y z", "('x 'y 'z)");
         case(r"(\x. (\y. x))", r"(\x y. x)");
-        case(r"((\x f . (f x)) b (\n . n))", "b");
+        case(r"((\x f . (f x)) b (\n . n))", "'b");
     }
 }

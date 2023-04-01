@@ -5,7 +5,8 @@ use std::{
 };
 
 pub enum Term {
-    Symbol(String),
+    Var(String),
+    Free(String),
     Application { func: Rc<Self>, arg: Rc<Self> },
     Lambda { var: String, body: Rc<Self> },
 }
@@ -23,7 +24,8 @@ impl fmt::Display for Term {
             }
 
             match term {
-                Term::Symbol(sym) => f.write_str(sym),
+                Term::Var(sym) => f.write_str(sym),
+                Term::Free(sym) => write!(f, "'{sym}"),
                 Term::Application { func, arg } => {
                     if !is_application_head {
                         f.write_char('(')?;
@@ -55,10 +57,11 @@ impl fmt::Display for Term {
 impl Term {
     pub fn eval(&self, env: &mut Env) -> Rc<Self> {
         match self {
-            Self::Symbol(sym) => env
+            Self::Var(sym) => env
                 .get(sym)
                 .cloned()
-                .unwrap_or_else(|| Rc::new(Self::Symbol(sym.clone()))),
+                .unwrap_or_else(|| Rc::new(Self::Free(sym.clone()))),
+            Self::Free(sym) => Rc::new(Self::Free(sym.clone())),
             Self::Application { func, arg } => {
                 let func = func.eval(env);
                 let arg = arg.eval(env);
@@ -68,6 +71,8 @@ impl Term {
                         let ret = body.eval(env);
                         if let Some(old) = old {
                             env.insert(var.clone(), old);
+                        } else {
+                            env.remove(var);
                         }
                         ret
                     }
@@ -75,13 +80,16 @@ impl Term {
                 }
             }
             Self::Lambda { var, body } => {
-                let old = env.remove(var);
+                let old =
+                    env.insert(var.clone(), Rc::new(Self::Var(var.clone())));
                 let ret = Rc::new(Self::Lambda {
                     var: var.clone(),
                     body: body.eval(env),
                 });
                 if let Some(old) = old {
                     env.insert(var.clone(), old);
+                } else {
+                    env.remove(var);
                 }
                 ret
             }

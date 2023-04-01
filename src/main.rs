@@ -17,7 +17,7 @@ fn main() {
     for line in editor.iter("> ").filter_map(Result::ok) {
         let lexer = Token::lexer(&line);
         let tokens = lexer.collect::<Vec<_>>();
-        match parser::parse_expression(&tokens) {
+        match parser::term(&tokens) {
             Some((parsed, &[])) => println!("{}", parsed.eval(&mut env)),
             _ => println!("Syntax error!"),
         }
@@ -37,7 +37,7 @@ mod tests {
             let tokens = lexer.collect::<Vec<_>>();
             let mut env = HashMap::new();
             assert_eq!(
-                super::parser::parse_expression(&tokens)
+                super::parser::term(&tokens)
                     .unwrap()
                     .0
                     .eval(&mut env)

@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 mod env;
 mod lexer;
 mod parser;

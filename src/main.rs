@@ -19,7 +19,10 @@ fn main() {
     .unwrap();
     for line in editor.iter("> ").filter_map(Result::ok) {
         let lexer = Token::lexer(&line);
-        let tokens = lexer.collect::<Vec<_>>();
+        let Ok(tokens) = lexer.collect::<Result<Vec<_>, _>>() else {
+            println!("Syntax error!");
+            continue;
+        };
         match parser::statement(&tokens) {
             Some(statement::Statement::Evaluate(term)) => {
                 println!("{}", term.eval(&mut env));
@@ -43,7 +46,7 @@ mod tests {
             use std::collections::HashMap;
 
             let lexer = super::lexer::Token::lexer(input);
-            let tokens = lexer.collect::<Vec<_>>();
+            let tokens = lexer.collect::<Result<Vec<_>, _>>().unwrap();
             let mut env = HashMap::new();
             assert_eq!(
                 super::parser::term(&tokens)

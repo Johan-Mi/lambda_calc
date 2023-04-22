@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+#![warn(clippy::nursery, clippy::pedantic)]
 
 mod env;
 mod lexer;
